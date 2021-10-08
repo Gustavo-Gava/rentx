@@ -71,7 +71,7 @@ export const Price = styled.Text`
   color: ${({ theme }) => theme.colors.main};
 `
 
-export const Acessories = styled.View`
+export const Accessories = styled.View`
   flex-direction: row;
   flex-wrap: wrap;
 

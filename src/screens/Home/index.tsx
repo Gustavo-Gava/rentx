@@ -1,7 +1,10 @@
+import React, { useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
-import React from 'react'
-import { StatusBar } from 'react-native'
+import { FlatList, StatusBar } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
+
+import api from '../../services/api'
+import { CarDTO } from '../../dtos/carDTO'
 
 import LogoSvg from '../../assets/logo.svg'
 import { Car } from '../../components/Car'
@@ -10,6 +13,7 @@ import {
   CarList,
   Container, Header, HeaderContent, TotalCars, 
 } from './styles'
+import { Loading } from '../../components/Loading'
 
 interface CarData {
   brand: string
@@ -22,36 +26,33 @@ interface CarData {
 }
 
 interface NavigationProps {
-  navigate: (screen: string) => void;
+  navigate: (screen: string, car: object) => void;
 }
 
 export function Home(){
   const navigation = useNavigation<NavigationProps>()
 
-  const Cars = [
-    {
-      brand: 'AUDI',
-      name: "RS 5 Coupé",
-      rent: {
-        period: 'Ao dia',
-        price: 120,
-      },
-      thumbnail: 'https://mediaservice.audi.com/media/live/50900/fly1400x601n1/f5f/2021.png?wid=850'
-    },
-    {
-      brand: 'PORSCHE',
-      name: "Panamera",
-      rent: {
-        period: 'Ao dia',
-        price: 340,
-      },
-      thumbnail: 'https://www.webmotors.com.br/imagens/prod/347468/PORSCHE_PANAMERA_2.9_V6_EHYBRID_4_PDK_3474681900348621.png?s=fill&w=130&h=97&q=70&t=true)'
-    }
-  ]
+  const [cars, setCars] = useState<CarDTO[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  function handleCarDetails() {
-    navigation.navigate("CarDetails")
+  function handleCarDetails(car: CarDTO) {
+    navigation.navigate("CarDetails", { car })
   }
+
+  useEffect(() => {
+    async function fetchCars() {
+      try {
+        const response = await api.get('/cars')
+        setCars(response.data)
+      } catch {
+        console.log('erro')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchCars()
+  }, [])
 
   return (
     <Container>
@@ -68,17 +69,23 @@ export function Home(){
             height={RFValue(12)}
           />
           <TotalCars>
-            Total de 12 carros
+            Total de {cars.length} carros
           </TotalCars>
         </HeaderContent>
       </Header>
-
-      <CarList 
-        data={Cars}
-        renderItem={({ item }: CarData) => (
-          <Car data={item} onPress={handleCarDetails}/>
-        )}
-      />
+      {
+        isLoading ? (
+          <Loading />
+        ) : (
+        <CarList 
+          data={cars}
+          keyExtractor={item => item.name}
+          renderItem={({ item }) => (
+            <Car data={item} onPress={() => handleCarDetails(item)} />
+          )}
+        />
+        )
+      }
     </Container>
   )
 }

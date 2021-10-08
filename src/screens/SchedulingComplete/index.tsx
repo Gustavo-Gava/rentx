@@ -16,7 +16,7 @@ import {
 import { useNavigation } from '@react-navigation/native'
 
 interface NavigationProps {
-  popToTop: () => void
+  navigate: (screen: string) => void;
 }
 
 export function SchedulingComplete(){
@@ -24,7 +24,7 @@ export function SchedulingComplete(){
   const { width } = useWindowDimensions()
 
   function handleConfirmRent() {
-    navigation.popToTop()
+    navigation.navigate("Home")
   }
   
   return (
