@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native'
 import React from 'react'
 import { StatusBar } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -20,7 +21,12 @@ interface CarData {
   thumbnail: string
 }
 
+interface NavigationProps {
+  navigate: (screen: string) => void;
+}
+
 export function Home(){
+  const navigation = useNavigation<NavigationProps>()
 
   const Cars = [
     {
@@ -43,6 +49,9 @@ export function Home(){
     }
   ]
 
+  function handleCarDetails() {
+    navigation.navigate("CarDetails")
+  }
 
   return (
     <Container>
@@ -66,9 +75,8 @@ export function Home(){
 
       <CarList 
         data={Cars}
-        keyExtractor={(item: CarData, index) => item.name}
         renderItem={({ item }: CarData) => (
-          <Car data={item} />
+          <Car data={item} onPress={handleCarDetails}/>
         )}
       />
     </Container>

@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native'
 import React from 'react'
 import { TouchableOpacityProps } from 'react-native'
 import Feather from 'react-native-vector-icons/Feather'
@@ -14,8 +15,17 @@ interface Props extends TouchableOpacityProps {
 export function BackButton({ color, ...rest }: Props){
   const theme = useTheme()
 
+  const navigation = useNavigation()
+
+  function handleGoBack() {
+    navigation.goBack()
+  }
+
   return (
-    <Container {...rest}>
+    <Container 
+      onPress={handleGoBack}
+      {...rest}
+    >
       <Feather 
         name="chevron-left" 
         size={24}

@@ -1,10 +1,11 @@
 import React from 'react'
 
-import Feather from 'react-native-vector-icons/Feather'
+import { useNavigation } from '@react-navigation/native'
 
 import { Acessory } from '../../components/Acessory'
 import { BackButton } from '../../components/BackButton'
 import { ImageSlider } from '../../components/ImageSlider'
+import { Button } from '../../components/Button'
 
 import SpeedSvg from '../../assets/speed.svg'
 import AccelerationSvg from '../../assets/acceleration.svg'
@@ -13,6 +14,9 @@ import GasolineSvg from '../../assets/gasoline.svg'
 import ExchangeSvg from '../../assets/exchange.svg'
 import PeopleSvg from '../../assets/people.svg'
 
+import Feather from 'react-native-vector-icons/Feather'
+import { RFValue } from 'react-native-responsive-fontsize'
+import theme from '../../styles/theme'
 import {
   Acessories,
   Brand,
@@ -24,12 +28,18 @@ import {
   DateInfo, 
   DateTitle, DateValue, Description, Details, Divider, Footer, Header, Name, Period, Price, Rent, RentalPeriod, RentalPrice, RentalPriceDetails, RentalPriceLabel, RentalPriceQuota, RentalPriceTotal
 } from './styles'
-import { Button } from '../../components/Button'
-import { RFValue } from 'react-native-responsive-fontsize'
-import theme from '../../styles/theme'
 
+interface NavigationProps {
+  navigate: (screen: string) => void;
+}
 
 export function SchedulingDetails(){
+  const navigation = useNavigation<NavigationProps>()
+
+  function handleConfirmRent() {
+    navigation.navigate("SchedulingComplete")
+  }
+
   return (
     <Container>
       <Header>
@@ -105,7 +115,7 @@ export function SchedulingDetails(){
 
       <Footer>
         <ButtonWrapper>
-          <Button title="Escolher período do aluguel" />
+          <Button title="Escolher período do aluguel" onPress={handleConfirmRent}/>
         </ButtonWrapper>
       </Footer>
     </Container>
