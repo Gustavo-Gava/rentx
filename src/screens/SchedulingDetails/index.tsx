@@ -1,24 +1,20 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 
 import { Acessory } from '../../components/Acessory'
 import { BackButton } from '../../components/BackButton'
 import { ImageSlider } from '../../components/ImageSlider'
 import { Button } from '../../components/Button'
 
-import SpeedSvg from '../../assets/speed.svg'
-import AccelerationSvg from '../../assets/acceleration.svg'
-import ForceSvg from '../../assets/force.svg'
-import GasolineSvg from '../../assets/gasoline.svg'
-import ExchangeSvg from '../../assets/exchange.svg'
-import PeopleSvg from '../../assets/people.svg'
+import { getAccessoryIcon } from '../../utils/getAccessoryIcon'
+import { CarDTO } from '../../dtos/carDTO'
 
 import Feather from 'react-native-vector-icons/Feather'
 import { RFValue } from 'react-native-responsive-fontsize'
 import theme from '../../styles/theme'
 import {
-  Acessories,
+  Accessories,
   Brand,
   ButtonWrapper,
   CalendarIcon,
@@ -28,54 +24,106 @@ import {
   DateInfo, 
   DateTitle, DateValue, Description, Details, Divider, Footer, Header, Name, Period, Price, Rent, RentalPeriod, RentalPrice, RentalPriceDetails, RentalPriceLabel, RentalPriceQuota, RentalPriceTotal
 } from './styles'
+import { getPlatformDate } from '../../utils/getPlatformDate'
+import { format } from 'date-fns'
+import api from '../../services/api'
+import { Alert } from 'react-native'
+import { LoadingButton } from '../../components/LoadingButton'
 
 interface NavigationProps {
   navigate: (screen: string) => void;
 }
 
-export function SchedulingDetails(){
-  const navigation = useNavigation<NavigationProps>()
+interface Params { 
+  car: CarDTO
+  dates: string[]
+}
 
-  function handleConfirmRent() {
-    navigation.navigate("SchedulingComplete")
+interface RentalPeriod {
+  start: string;
+  end: string;
+}
+
+interface SchedulesByCar {
+  data: {
+    id: string
+    unavailable_dates: string[]
   }
+}
+
+export function SchedulingDetails(){
+  const route = useRoute()
+  const { car, dates } = route.params as Params
+  const navigation = useNavigation<NavigationProps>()
+  const [rentalPeriod, setRentalPeriod] = useState<RentalPeriod>({} as RentalPeriod)
+  const [isLoading, setIsLoading] = useState(false)
+
+  async function handleConfirmRent() {
+    setIsLoading(true)
+
+    const schedulesByCar: SchedulesByCar = await api.get(`/schedules_bycars/${car.id}`)
+
+    const unavailable_dates = [
+      ...schedulesByCar.data.unavailable_dates,
+      ...dates
+    ]
+
+    try {
+
+      await api.put(`/schedules_bycars/${car.id}`, {
+        id: car.id,
+        unavailable_dates
+      })
+      navigation.navigate('SchedulingComplete')
+    } catch {
+      Alert.alert("Não foi possível confirmar o agendamento!!")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    setRentalPeriod({
+      start: format(getPlatformDate(new Date(dates[0])), 'dd/MM/yyyy'),
+      end: format(getPlatformDate(new Date(dates[dates.length - 1])), 'dd/MM/yyyy')
+    })
+  }, [])
 
   return (
     <Container>
       <Header>
         <BackButton 
-          onPress={() => {}}
           color="black"
         />
       </Header>
 
       <CarImages> 
         <ImageSlider 
-          imagesUrl={['https://mediaservice.audi.com/media/live/50900/fly1400x601n1/f5f/2021.png?wid=850']}
+          imagesUrl={[car.thumbnail]}
         />
       </CarImages>
 
       <Content>
         <Details>
           <Description>
-            <Brand>Lamborghini</Brand>
-            <Name>Huracan</Name>
+            <Brand>{car.brand}</Brand>
+            <Name>{car.name}</Name>
           </Description>
 
           <Rent>
             <Period>Ao dia</Period>
-            <Price>R$ 180</Price>
+            <Price>{`R$ ${car.rent.price}`}</Price>
           </Rent>
         </Details>
 
-        <Acessories> 
-          <Acessory icon={SpeedSvg} name="380km/h" />
-          <Acessory icon={AccelerationSvg} name="3.2s" />
-          <Acessory icon={ForceSvg} name="800 HP" />
-          <Acessory icon={GasolineSvg} name="Gasolina" />
-          <Acessory icon={ExchangeSvg} name="Auto" />
-          <Acessory icon={PeopleSvg} name="2 pessoas" />
-        </Acessories>
+        <Accessories> 
+          {car.accessories.map(acessory => (
+            <Acessory 
+              key={acessory.name}
+              icon={getAccessoryIcon(acessory.type)} 
+              name={acessory.name} />
+          ))}
+        </Accessories>
 
         <RentalPeriod>
           <CalendarIcon>
@@ -87,7 +135,7 @@ export function SchedulingDetails(){
 
           <DateInfo>
             <DateTitle>DE</DateTitle>
-            <DateValue>18/06/2021</DateValue>
+            <DateValue>{rentalPeriod.start}</DateValue>
           </DateInfo>
 
           <Feather 
@@ -97,7 +145,7 @@ export function SchedulingDetails(){
 
           <DateInfo>
             <DateTitle>ATÉ</DateTitle>
-            <DateValue>20/06/2021</DateValue>
+            <DateValue>{rentalPeriod.end}</DateValue>
           </DateInfo>
         </RentalPeriod>
 
@@ -106,8 +154,8 @@ export function SchedulingDetails(){
         <RentalPrice>
           <RentalPriceLabel>TOTAL</RentalPriceLabel>
           <RentalPriceDetails>
-            <RentalPriceQuota>R$ 580 X 3</RentalPriceQuota>
-            <RentalPriceTotal>R$ 2.900</RentalPriceTotal>
+            <RentalPriceQuota>{`R$ ${car.rent.price} X ${dates.length} diárias`}</RentalPriceQuota>
+            <RentalPriceTotal>R$ {car.rent.price * dates.length}</RentalPriceTotal>
           </RentalPriceDetails>
         </RentalPrice>
 
@@ -115,7 +163,17 @@ export function SchedulingDetails(){
 
       <Footer>
         <ButtonWrapper>
-          <Button title="Escolher período do aluguel" onPress={handleConfirmRent}/>
+          { isLoading ? (
+            <LoadingButton />
+          )
+            : (
+              <Button 
+              title="Alugar Agora" 
+              color={theme.colors.success} 
+              onPress={handleConfirmRent}
+            />
+            )  
+        }
         </ButtonWrapper>
       </Footer>
     </Container>

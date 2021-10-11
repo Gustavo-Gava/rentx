@@ -23,7 +23,7 @@ export function SchedulingComplete(){
   const navigation = useNavigation<NavigationProps>()
   const { width } = useWindowDimensions()
 
-  function handleConfirmRent() {
+  function handleGoHome() {
     navigation.navigate("Home")
   }
   
@@ -52,7 +52,7 @@ export function SchedulingComplete(){
         </Message>
 
         <Button>
-          <TextButton onPress={handleConfirmRent}>OK</TextButton>
+          <TextButton onPress={handleGoHome}>OK</TextButton>
         </Button>
       </Content>
     </Container>

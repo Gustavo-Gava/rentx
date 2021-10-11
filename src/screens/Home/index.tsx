@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
-import { FlatList, StatusBar } from 'react-native'
+import { Alert, StatusBar } from 'react-native'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import { RFValue } from 'react-native-responsive-fontsize'
 
 import api from '../../services/api'
@@ -11,9 +12,10 @@ import { Car } from '../../components/Car'
 
 import {
   CarList,
-  Container, Header, HeaderContent, TotalCars, 
+  Container, Header, HeaderContent, MyCarsButton, TotalCars, 
 } from './styles'
 import { Loading } from '../../components/Loading'
+import theme from '../../styles/theme'
 
 interface CarData {
   brand: string
@@ -45,7 +47,7 @@ export function Home(){
         const response = await api.get('/cars')
         setCars(response.data)
       } catch {
-        console.log('erro')
+        Alert.alert("Não foi possível accessar os dados!")
       } finally {
         setIsLoading(false)
       }
@@ -86,6 +88,14 @@ export function Home(){
         />
         )
       }
+
+      <MyCarsButton>
+        <Ionicons 
+          name="ios-car-sport"
+          size={32}
+          color={theme.colors.background_secondary}
+        />
+      </MyCarsButton>
     </Container>
   )
 }

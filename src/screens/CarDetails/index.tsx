@@ -21,7 +21,7 @@ import { CarDTO } from '../../dtos/carDTO'
 import { getAccessoryIcon } from '../../utils/getAccessoryIcon'
 
 interface NavigationProps {
-  navigate: (screen: string) => void;
+  navigate: (screen: string, car: any) => void;
 }
 
 interface Params {
@@ -34,11 +34,8 @@ export function CarDetails(){
   const { car } = route.params as Params
 
   function handleConfirmRental() {
-    navigation.navigate("Scheduling")
+    navigation.navigate("Scheduling", { car })
   }
-
-  console.log(getAccessoryIcon('acceleration'))
-  console.log(car.accessories)
 
   return (
     <Container>
