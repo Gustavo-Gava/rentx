@@ -13,7 +13,7 @@ export function LoadingButton({ color, ...rest }: Props){
   return (
     <Container color={color} {...rest}>
       <ActivityIndicator 
-        color="#202020"
+        color="#aaa"
         size="small"
       />
     </Container>

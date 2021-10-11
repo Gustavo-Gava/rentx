@@ -69,6 +69,12 @@ export function SchedulingDetails(){
     ]
 
     try {
+      await api.post('schedules_byuser', {
+        user_id: 1,
+        car,
+        startDate: rentalPeriod.start,
+        endDate: rentalPeriod.end,
+      })
 
       await api.put(`/schedules_bycars/${car.id}`, {
         id: car.id,
@@ -164,7 +170,7 @@ export function SchedulingDetails(){
       <Footer>
         <ButtonWrapper>
           { isLoading ? (
-            <LoadingButton />
+            <LoadingButton color={theme.colors.success}/>
           )
             : (
               <Button 

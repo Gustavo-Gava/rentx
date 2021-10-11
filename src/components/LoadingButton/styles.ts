@@ -16,6 +16,8 @@ export const Container = styled.TouchableOpacity<ButtonProps>`
   color ? color
   : theme.colors.main_light
   )};
+
+  opacity: 0.7;
 `
 
 export const Title = styled.Text`

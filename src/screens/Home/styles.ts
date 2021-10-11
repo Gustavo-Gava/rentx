@@ -48,10 +48,6 @@ export const CarList = styled(FlatList as new () => FlatList<CarDTO>)
 `
 
 export const MyCarsButton = styled.TouchableOpacity`
-  /* position: fixed;
-  left: 0;
-  top: 0; */
-
   border-radius: 9999px;
 
   justify-content: center;
@@ -63,8 +59,6 @@ export const MyCarsButton = styled.TouchableOpacity`
   background-color: ${({ theme }) => theme.colors.main};
 
   position: absolute;
-  bottom: 0;
-  right: 0;
-
-  margin: 0 23px 13px 0;
+  bottom: 13px;
+  right: 23px;
 `

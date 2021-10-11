@@ -28,7 +28,7 @@ interface CarData {
 }
 
 interface NavigationProps {
-  navigate: (screen: string, car: object) => void;
+  navigate: (screen: string, car?: object) => void;
 }
 
 export function Home(){
@@ -39,6 +39,10 @@ export function Home(){
 
   function handleCarDetails(car: CarDTO) {
     navigation.navigate("CarDetails", { car })
+  }  
+  
+  function handleScheduleList() {
+    navigation.navigate("ScheduleList")
   }
 
   useEffect(() => {
@@ -89,7 +93,7 @@ export function Home(){
         )
       }
 
-      <MyCarsButton>
+      <MyCarsButton onPress={handleScheduleList}>
         <Ionicons 
           name="ios-car-sport"
           size={32}
